@@ -1,17 +1,27 @@
+import java.util.Random;
 import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        
+
         System.out.println("Enter your name:");
         String usersName = scanner.nextLine();
-        
-        int [][] field = new int[7][7];
+
+        int[][] field = new int[7][7];
         String[][] displayField = new String[7][7];
 
         buildTheField(displayField);
-     
+
+        placeShip(field, 3);
+        placeShip(field, 2);
+        placeShip(field, 2);
+        placeShip(field, 1);
+        placeShip(field, 1);
+        placeShip(field, 1);
+        placeShip(field, 1);
     }
+    
     
     public static void buildTheField(String[][] displayField) {
         System.out.println("    1  2  3  4  5  6  7");
@@ -25,5 +35,46 @@ public class Main {
         }
         System.out.println("   ---------------------");
     }
+    
+    
+    public static void placeShip(int[][] field, int size) {
+        Random random = new Random();
+        int row = 0;
+        int column = 0;
 
+        while (true) {
+            row = random.nextInt(7);
+            column = random.nextInt(7);
+            int direction = random.nextInt(2);
+
+            if (isShipPlacementValid(field, row, column, size, direction)) {
+                for (int i = 0; i < size; i++) {
+                    if (direction == 0) {
+                        field[row][column + i] = 1;
+                    } else {
+                        field[row + i][column] = 1;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    public static boolean isShipPlacementValid(int[][] field, int row, int column, int size, int direction) {
+        if (direction == 0 && column + size > 7) {
+            return false;
+        } else if (direction == 1 && row + size > 7) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (direction == 0 && field[row][column + i] == 1) {
+                return false;
+            } else if (direction == 1 && field[row + i][column] == 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
