@@ -20,6 +20,8 @@ public class Main {
         placeShip(field, 1);
         placeShip(field, 1);
         placeShip(field, 1);
+        
+        playGame(field, displayField);
     }
     
     
@@ -81,6 +83,7 @@ public class Main {
         return true;
     }
 
+
     public static boolean hasAdjacentShipAtCorners(int[][] field, int row, int column, int size, int direction) {
         for (int i = -1; i <= size; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -93,5 +96,56 @@ public class Main {
             }
         }
         return false;
+    }
+    
+    
+    public static void playGame(int[][] field, String[][] displayField) {
+        Scanner scanner = new Scanner(System.in);
+        int shots = 0;
+
+        while (true) {
+            System.out.println("Enter the coordinates of the shot: ");
+            int usersRow = scanner.nextInt() - 1;
+            int usersColumn = scanner.nextInt() - 1;
+
+            if (field[usersRow][usersColumn] == 1) {
+                displayField[usersRow][usersColumn] = " ■ ";
+                
+                if (isShipSunk(field, usersRow, usersColumn)) {
+                    System.out.println("Sunk!");
+                }
+            } 
+            else {
+                displayField[usersRow][usersColumn] = " M ";
+            }
+        }
+    }
+        
+    
+    public static boolean isShipSunk(int[][] field, int row, int column) {
+        int targetShipValue = field[row][column];
+
+        int left = column;
+        while (left >= 0 && field[row][left] == targetShipValue) {
+            left--;
+        }
+
+        int right = column + 1;
+        while (right < 7 && field[row][right] == targetShipValue) {
+            right++;
+        }
+
+        int up = row;
+        while (up >= 0 && field[up][column] == targetShipValue) {
+            up--;
+        }
+
+        int down = row + 1;
+        while (down < 7 && field[down][column] == targetShipValue) {
+            down++;
+        }
+
+        return (right - left - 1 == targetShipValue && targetShipValue > 1) ||
+               (down - up - 1 == targetShipValue && targetShipValue > 1);
     }
 }
