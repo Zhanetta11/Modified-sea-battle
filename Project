@@ -39,12 +39,10 @@ public class Main {
     
     public static void placeShip(int[][] field, int size) {
         Random random = new Random();
-        int row = 0;
-        int column = 0;
-
+       
         while (true) {
-            row = random.nextInt(7);
-            column = random.nextInt(7);
+            int row = random.nextInt(7);
+            int column = random.nextInt(7);
             int direction = random.nextInt(2);
 
             if (isShipPlacementValid(field, row, column, size, direction)) {
@@ -60,6 +58,7 @@ public class Main {
         }
     }
 
+
     public static boolean isShipPlacementValid(int[][] field, int row, int column, int size, int direction) {
         if (direction == 0 && column + size > 7) {
             return false;
@@ -73,8 +72,26 @@ public class Main {
             } else if (direction == 1 && field[row + i][column] == 1) {
                 return false;
             }
+
+            if (hasAdjacentShipAtCorners(field, row, column, size, direction)) {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    public static boolean hasAdjacentShipAtCorners(int[][] field, int row, int column, int size, int direction) {
+        for (int i = -1; i <= size; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int adjacentRow  = row + i;
+                int adjacentColumn = column + j;
+
+                if (adjacentRow >= 0 && adjacentRow < 7 && adjacentColumn >= 0 && adjacentColumn < 7 && field[adjacentRow][adjacentColumn] == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
