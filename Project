@@ -1,5 +1,4 @@
 import java.util.Scanner;
-
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -8,5 +7,23 @@ public class Main {
         String usersName = scanner.nextLine();
         
         int [][] field = new int[7][7];
+        String[][] displayField = new String[7][7];
+
+        buildTheField(displayField);
+     
     }
+    
+    public static void buildTheField(String[][] displayField) {
+        System.out.println("    1  2  3  4  5  6  7");
+        for (int i = 0; i < 7; i++) {
+            System.out.print((i + 1) + " |");
+            for (int j = 0; j < 7; j++) {
+                displayField[i][j] = " ~ ";
+                System.out.print(displayField[i][j]);
+            }
+            System.out.println("|");
+        }
+        System.out.println("   ---------------------");
+    }
+
 }
