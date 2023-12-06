@@ -101,21 +101,33 @@ public class Main {
     
     public static void playGame(int[][] field, String[][] displayField) {
         Scanner scanner = new Scanner(System.in);
+        int totalShips = 11; 
         int shots = 0;
 
-        while (true) {
+        while (totalShips > 0) {
             System.out.println("Enter the coordinates of the shot: ");
             int usersRow = scanner.nextInt() - 1;
             int usersColumn = scanner.nextInt() - 1;
+            
+            if (usersRow < 0 || usersRow >= 7 || usersColumn < 0 || usersColumn >= 7) {
+                System.out.println("Invalid coordinates. Try again.");
+                continue;
+            }
+
+            if (displayField[usersRow][usersColumn].equals(" M ") || displayField[usersRow][usersColumn].equals(" X ") || displayField[usersRow][usersColumn].equals(" ■ ")) {
+                System.out.println("You've already shot at this cell. Try again.");
+                continue;
+            }
 
             if (field[usersRow][usersColumn] == 1) {
                 displayField[usersRow][usersColumn] = " ■ ";
-                
+                field[usersRow][usersColumn] = 2;  
+                totalShips--;
+
                 if (isShipSunk(field, usersRow, usersColumn)) {
-                    System.out.println("Sunk!");
+                    markSunkShip(displayField, field, usersRow, usersColumn);
                 }
-            } 
-            else {
+            } else {
                 displayField[usersRow][usersColumn] = " M ";
             }
             
@@ -124,44 +136,62 @@ public class Main {
             printField(displayField);
 
             shots++;
-            
-            if (areAllShipsSunk(field)) {
-                System.out.println("Congratulations! You sank all the ships in " + shots + " shots.");
-                break;  
-            }
+        }
+    
+        clearConsole();    
+        System.out.println("Congratulations! You sank all the ships in " + shots + " shots.");
+        System.out.println("\nDo you want to start a new game?");
+        scanner.nextLine();
+        String usersAnswer = scanner.nextLine();
+        if (usersAnswer.equals("yes") || usersAnswer.equals("Yes")) {
+            buildTheField(displayField);
+            placeShip(field, 3);
+            placeShip(field, 2);
+            placeShip(field, 2);
+            placeShip(field, 1);
+            placeShip(field, 1);
+            placeShip(field, 1);
+            placeShip(field, 1);
+        
+            playGame(field, displayField);
+        }
+        else {
+            return;
         }
     }
         
     
     
     public static boolean isShipSunk(int[][] field, int row, int column) {
-        int targetShipValue = field[row][column];
+        int size = field[row][column];
+        for (int i = 0; i < size; i++) {
+            if (column + i < 7 && field[row][column + i] != 2) {
+                return false;
+            }
+        }
+ 
+        for (int i = 0; i < size; i++) {
+            if (row + i < 7 && field[row + i][column] != 2) {
+                return false; 
+            }
+        }
+        return true;
+    }
+    
 
-        int left = column;
-        while (left >= 0 && field[row][left] == targetShipValue) {
-            left--;
+    public static void markSunkShip(String[][] displayField, int[][] field, int row, int column) {
+        int size = field[row][column];
+
+        for (int i = 0; i < size; i++) {
+            displayField[row][column + i] = " X ";
         }
 
-        int right = column + 1;
-        while (right < 7 && field[row][right] == targetShipValue) {
-            right++;
+        for (int i = 0; i < size; i++) {
+            displayField[row + i][column] = " X ";
         }
-
-        int up = row;
-        while (up >= 0 && field[up][column] == targetShipValue) {
-            up--;
-        }
-
-        int down = row + 1;
-        while (down < 7 && field[down][column] == targetShipValue) {
-            down++;
-        }
-
-        return (right - left - 1 == targetShipValue && targetShipValue > 1) ||
-               (down - up - 1 == targetShipValue && targetShipValue > 1);
     }
 
-    
+
     public static void printField(String[][] displayField) {
         System.out.println("    1  2  3  4  5  6  7");
         for (int i = 0; i < 7; i++) {
@@ -173,19 +203,8 @@ public class Main {
         }
         System.out.println("   ---------------------");
     }
-    
-    
-    public static boolean areAllShipsSunk(int[][] field) {
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-                if (field[i][j] == 1 && !isShipSunk(field, i, j)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
+   
+   
     public static void clearConsole() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
