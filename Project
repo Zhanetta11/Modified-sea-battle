@@ -4,7 +4,12 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
+        
+        System.out.println("                               Welcome to the Sea Battle game!\nBefore you embark on this exciting journey, it's crucial to familiarize yourself with the rules of the game.\nTake a moment to understand the rules, plot your course wisely, and get ready for an intense battle on the high seas.\n ");
+        System.out.println("Rules of the game:\n1)The game includes ships of different sizes: one ship of size 3, two ships of size 2, and four ships of size 1.\n2)The coordinates are entered as row and column numbers (both ranging from 1 to 7).\n3)After each shot, the result is displayed:\n -✘ for a miss,\n -H for a hit,\n -■ for a sunk ship.\n Good luck! ");
+        System.out.println("\nPress Enter to start the game");
+        scanner.nextLine();
+        clearConsole();
         System.out.println("Enter your name:");
         String usersName = scanner.nextLine();
 
@@ -85,12 +90,9 @@ public class Main {
 
 
     public static boolean hasAdjacentShipAtCorners(int[][] field, int row, int column, int size, int direction) {
-        for (int i = -1; i <= size; i++) {
-            for (int j = -1; j <= 1; j++) {
-                int adjacentRow  = row + i;
-                int adjacentColumn = column + j;
-
-                if (adjacentRow >= 0 && adjacentRow < 7 && adjacentColumn >= 0 && adjacentColumn < 7 && field[adjacentRow][adjacentColumn] == 1) {
+        for (int i = row - 1; i <= row + size; i++) {
+            for (int j = column - 1; j <= column + size; j++) {
+                if (i >= 0 && i < 7 && j >= 0 && j < 7 && field[i][j] == 1) {
                     return true;
                 }
             }
@@ -114,21 +116,22 @@ public class Main {
                 continue;
             }
 
-            if (displayField[usersRow][usersColumn].equals(" M ") || displayField[usersRow][usersColumn].equals(" X ") || displayField[usersRow][usersColumn].equals(" ■ ")) {
+            if (displayField[usersRow][usersColumn].equals(" ✘ ") || displayField[usersRow][usersColumn].equals(" ■ ") || displayField[usersRow][usersColumn].equals(" H ")) {
                 System.out.println("You've already shot at this cell. Try again.");
                 continue;
             }
 
             if (field[usersRow][usersColumn] == 1) {
-                displayField[usersRow][usersColumn] = " ■ ";
+                displayField[usersRow][usersColumn] = " H ";
                 field[usersRow][usersColumn] = 2;  
                 totalShips--;
 
                 if (isShipSunk(field, usersRow, usersColumn)) {
+                    displayField[usersRow][usersColumn] = " ■ ";
                     markSunkShip(displayField, field, usersRow, usersColumn);
                 }
             } else {
-                displayField[usersRow][usersColumn] = " M ";
+                displayField[usersRow][usersColumn] = " ✘ ";
             }
             
             clearConsole();
@@ -161,20 +164,20 @@ public class Main {
     }
         
     
-    
     public static boolean isShipSunk(int[][] field, int row, int column) {
         int size = field[row][column];
+
         for (int i = 0; i < size; i++) {
             if (column + i < 7 && field[row][column + i] != 2) {
                 return false;
             }
         }
- 
+
         for (int i = 0; i < size; i++) {
             if (row + i < 7 && field[row + i][column] != 2) {
-                return false; 
+                return false;
             }
-        }
+         }
         return true;
     }
     
@@ -183,11 +186,15 @@ public class Main {
         int size = field[row][column];
 
         for (int i = 0; i < size; i++) {
-            displayField[row][column + i] = " X ";
+            if (column + i < 7 && displayField[row][column + i].equals(" H ")) {
+                displayField[row][column + i] = " ■ ";
+            }
         }
 
         for (int i = 0; i < size; i++) {
-            displayField[row + i][column] = " X ";
+            if (row + i < 7 && displayField[row + i][column].equals(" H ")) {
+                displayField[row + i][column] = " ■ ";
+            }
         }
     }
 
