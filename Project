@@ -1,8 +1,10 @@
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
+    public static Map<String, Integer> playerScores = new HashMap<>();
+        
     public static void main(String[] args) {
+    
         Scanner scanner = new Scanner(System.in);
         
         System.out.println("                               Welcome to the Sea Battle game!\nBefore you embark on this exciting journey, it's crucial to familiarize yourself with the rules of the game.\nTake a moment to understand the rules, plot your course wisely, and get ready for an intense battle on the high seas.\n ");
@@ -26,7 +28,7 @@ public class Main {
         placeShip(field, 1);
         placeShip(field, 1);
         
-        playGame(field, displayField);
+        playGame(field, displayField, usersName);
     }
     
     
@@ -101,7 +103,7 @@ public class Main {
     }
     
     
-    public static void playGame(int[][] field, String[][] displayField) {
+    public static void playGame(int[][] field, String[][] displayField, String usersName) {
         Scanner scanner = new Scanner(System.in);
         int totalShips = 11; 
         int shots = 0;
@@ -110,7 +112,7 @@ public class Main {
             System.out.println("Enter the coordinates of the shot: ");
             int usersRow = scanner.nextInt() - 1;
             int usersColumn = scanner.nextInt() - 1;
-            
+
             if (usersRow < 0 || usersRow >= 7 || usersColumn < 0 || usersColumn >= 7) {
                 System.out.println("Invalid coordinates. Try again.");
                 continue;
@@ -123,81 +125,106 @@ public class Main {
 
             if (field[usersRow][usersColumn] == 1) {
                 displayField[usersRow][usersColumn] = " H ";
-                field[usersRow][usersColumn] = 2;  
+                field[usersRow][usersColumn] = 2;
                 totalShips--;
 
                 if (isShipSunk(field, usersRow, usersColumn)) {
-                    displayField[usersRow][usersColumn] = " ■ ";
+                
                     markSunkShip(displayField, field, usersRow, usersColumn);
                 }
             } else {
                 displayField[usersRow][usersColumn] = " ✘ ";
             }
-            
+
             clearConsole();
-            
+
             printField(displayField);
 
             shots++;
         }
-    
-        clearConsole();    
-        System.out.println("Congratulations! You sank all the ships in " + shots + " shots.");
+
+        clearConsole();
+        System.out.println("Congratulations, " + usersName + "! You sank all the ships in " + shots + " shots.");
+
+        playerScores.put(usersName, playerScores.getOrDefault(usersName, 0) + shots);
+
         System.out.println("\nDo you want to start a new game?");
-        scanner.nextLine();
+        scanner.nextLine(); 
         String usersAnswer = scanner.nextLine();
-        if (usersAnswer.equals("yes") || usersAnswer.equals("Yes")) {
-            buildTheField(displayField);
-            placeShip(field, 3);
-            placeShip(field, 2);
-            placeShip(field, 2);
-            placeShip(field, 1);
-            placeShip(field, 1);
-            placeShip(field, 1);
-            placeShip(field, 1);
-        
-            playGame(field, displayField);
-        }
+        if (usersAnswer.equalsIgnoreCase("yes")) {
+            playGame(field, displayField, usersName);
+        } 
         else {
-            return;
+            displayTopPlayers();
         }
     }
         
     
-    public static boolean isShipSunk(int[][] field, int row, int column) {
+      public static boolean isShipSunk(int[][] field, int row, int column) {
         int size = field[row][column];
 
-        for (int i = 0; i < size; i++) {
-            if (column + i < 7 && field[row][column + i] != 2) {
+        for (int i = 1; i < size; i++) {
+            if (column - i >= 0 && field[row][column - i] == 1) {
                 return false;
             }
         }
 
-        for (int i = 0; i < size; i++) {
-            if (row + i < 7 && field[row + i][column] != 2) {
+        for (int i = 1; i < size; i++) {
+            if (column + i < 7 && field[row][column + i] == 1) {
                 return false;
             }
-         }
+        }
+
+        for (int i = 1; i < size; i++) {
+            if (row - i >= 0 && field[row - i][column] == 1) {
+                return false;
+            }
+        }
+
+        for (int i = 1; i < size; i++) {
+            if (row + i < 7 && field[row + i][column] == 1) {
+                return false;
+            }
+        }
+
         return true;
     }
     
-
+    
     public static void markSunkShip(String[][] displayField, int[][] field, int row, int column) {
         int size = field[row][column];
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i <= size; i++) {
             if (column + i < 7 && displayField[row][column + i].equals(" H ")) {
                 displayField[row][column + i] = " ■ ";
             }
         }
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i <= size; i++) {
             if (row + i < 7 && displayField[row + i][column].equals(" H ")) {
                 displayField[row + i][column] = " ■ ";
+            
+            }
+        }
+        
+        for (int i = 1; i <= size; i++) {
+            if (column - i >= 0 && displayField[row][column - i].equals(" H ")) {
+                
+                displayField[row][column - i] = " ■ ";
+           
+            }
+        }
+
+        for (int i = 1; i <= size; i++) {
+            if (row - i >= 0  && displayField[row - i][column].equals(" H ")) {
+                
+                displayField[row - i][column] = " ■ ";
+          
+                
             }
         }
     }
-
+    
 
     public static void printField(String[][] displayField) {
         System.out.println("    1  2  3  4  5  6  7");
@@ -215,5 +242,22 @@ public class Main {
     public static void clearConsole() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
+    }
+    
+    
+    public static void displayTopPlayers() {
+        System.out.println("Top 10 Players:");
+
+        List<Map.Entry<String, Integer>> sortedPlayers = new ArrayList<>(playerScores.entrySet());
+        sortedPlayers.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+        int count = 0;
+        for (Map.Entry<String, Integer> entry : sortedPlayers) {
+            count++;
+            System.out.println(count + ". " + entry.getKey() + " - Shots: " + entry.getValue());
+            if (count == 10) {
+                break;
+            }
+        }
     }
 }
