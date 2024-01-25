@@ -1,17 +1,21 @@
 import java.util.*;
 
 public class Main {
-    public static Map<String, Integer> playerScores = new HashMap<>();
-        
+    private static final Map<String, Integer> playerScores = new HashMap<>();
+
     public static void main(String[] args) {
-    
         Scanner scanner = new Scanner(System.in);
-        
-        System.out.println("                               Welcome to the Sea Battle game!\nBefore you embark on this exciting journey, it's crucial to familiarize yourself with the rules of the game.\nTake a moment to understand the rules, plot your course wisely, and get ready for an intense battle on the high seas.\n ");
-        System.out.println("Rules of the game:\n1)The game includes ships of different sizes: one ship of size 3, two ships of size 2, and four ships of size 1.\n2)The coordinates are entered as row and column numbers (both ranging from 1 to 7).\n3)After each shot, the result is displayed:\n -✘ for a miss,\n -H for a hit,\n -■ for a sunk ship.\n Good luck! ");
-        System.out.println("\nPress Enter to start the game");
+
+        System.out.println("                                        Welcome to the Sea Battle game!\nBefore you embark on this exciting journey, familiarize yourself with the rules of the game.\nTake a moment to understand the rules, plot your course wisely, and get ready for an intense battle on the high seas.\n");
+        System.out.println("Rules of the game:\n1) The game includes ships of different sizes: one ship of size 3, two ships of size 2, and four ships of size 1.\n2) The coordinates are entered as row and column numbers (both ranging from 1 to 7).\n3) After each shot, the result is displayed:\n -✘ for a miss,\n -H for a hit,\n -■ for a sunk ship.");
+        System.out.println("\n                                      Press Enter to start the game!\n                                            Good luck! ");
         scanner.nextLine();
         clearConsole();
+
+        playGame(scanner);
+    }
+
+    public static void playGame(Scanner scanner) {
         System.out.println("Enter your name:");
         String usersName = scanner.nextLine();
 
@@ -27,85 +31,8 @@ public class Main {
         placeShip(field, 1);
         placeShip(field, 1);
         placeShip(field, 1);
-        
-        playGame(field, displayField, usersName);
-    }
-    
-    
-    public static void buildTheField(String[][] displayField) {
-        System.out.println("    1  2  3  4  5  6  7");
-        for (int i = 0; i < 7; i++) {
-            System.out.print((i + 1) + " |");
-            for (int j = 0; j < 7; j++) {
-                displayField[i][j] = " ~ ";
-                System.out.print(displayField[i][j]);
-            }
-            System.out.println("|");
-        }
-        System.out.println("   ---------------------");
-    }
-    
-    
-    public static void placeShip(int[][] field, int size) {
-        Random random = new Random();
-       
-        while (true) {
-            int row = random.nextInt(7);
-            int column = random.nextInt(7);
-            int direction = random.nextInt(2);
 
-            if (isShipPlacementValid(field, row, column, size, direction)) {
-                for (int i = 0; i < size; i++) {
-                    if (direction == 0) {
-                        field[row][column + i] = 1;
-                    } else {
-                        field[row + i][column] = 1;
-                    }
-                }
-                break;
-            }
-        }
-    }
-
-
-    public static boolean isShipPlacementValid(int[][] field, int row, int column, int size, int direction) {
-        if (direction == 0 && column + size > 7) {
-            return false;
-        } else if (direction == 1 && row + size > 7) {
-            return false;
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (direction == 0 && field[row][column + i] == 1) {
-                return false;
-            } else if (direction == 1 && field[row + i][column] == 1) {
-                return false;
-            }
-
-            if (hasAdjacentShipAtCorners(field, row, column, size, direction)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
-    public static boolean hasAdjacentShipAtCorners(int[][] field, int row, int column, int size, int direction) {
-        for (int i = row - 1; i <= row + size; i++) {
-            for (int j = column - 1; j <= column + size; j++) {
-                if (i >= 0 && i < 7 && j >= 0 && j < 7 && field[i][j] == 1) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    
-    public static void playGame(int[][] field, String[][] displayField, String usersName) {
-        Scanner scanner = new Scanner(System.in);
-        int totalShips = 11; 
+        int totalShips = 11;
         int shots = 0;
 
         while (totalShips > 0) {
@@ -129,10 +56,10 @@ public class Main {
                 totalShips--;
 
                 if (isShipSunk(field, usersRow, usersColumn)) {
-                
                     markSunkShip(displayField, field, usersRow, usersColumn);
                 }
-            } else {
+            } 
+            else {
                 displayField[usersRow][usersColumn] = " ✘ ";
             }
 
@@ -151,16 +78,78 @@ public class Main {
         System.out.println("\nDo you want to start a new game?");
         scanner.nextLine(); 
         String usersAnswer = scanner.nextLine();
+        
         if (usersAnswer.equalsIgnoreCase("yes")) {
-            playGame(field, displayField, usersName);
+            playGame(scanner);
         } 
         else {
             displayTopPlayers();
         }
     }
-        
+
+    public static void buildTheField(String[][] displayField) {
+        System.out.println("    1  2  3  4  5  6  7");
+        for (int i = 0; i < 7; i++) {
+            System.out.print((i + 1) + " |");
+            for (int j = 0; j < 7; j++) {
+                displayField[i][j] = " ~ ";
+                System.out.print(displayField[i][j]);
+            }
+            System.out.println("|");
+        }
+        System.out.println("   ---------------------");
+    }
+
+    public static void placeShip(int[][] field, int size) {
+        Random random = new Random();
+
+        while (true) {
+            int row = random.nextInt(7);
+            int column = random.nextInt(7);
+            int direction = random.nextInt(2);
+
+            if (isShipPlacementValid(field, row, column, size, direction)) {
+                for (int i = 0; i < size; i++) {
+                    if (direction == 0) {
+                        field[row][column + i] = 1;
+                    } else {
+                        field[row + i][column] = 1;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    public static boolean isShipPlacementValid(int[][] field, int row, int column, int size, int direction) {
+        if ((direction == 0 && column + size > 7) || (direction == 1 && row + size > 7)) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if ((direction == 0 && field[row][column + i] == 1) || (direction == 1 && field[row + i][column] == 1) || hasAdjacentShipAtCorners(field, row, column, size, direction)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    public static boolean hasAdjacentShipAtCorners(int[][] field, int row, int column, int size, int direction) {
+        for (int i = row - 1; i <= row + size; i++) {
+            for (int j = column - 1; j <= column + size; j++) {
+                if (i >= 0 && i < 7 && j >= 0 && j < 7 && field[i][j] == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     
-      public static boolean isShipSunk(int[][] field, int row, int column) {
+
+    public static boolean isShipSunk(int[][] field, int row, int column) {
         int size = field[row][column];
 
         for (int i = 1; i < size; i++) {
@@ -203,29 +192,23 @@ public class Main {
         for (int i = 0; i <= size; i++) {
             if (row + i < 7 && displayField[row + i][column].equals(" H ")) {
                 displayField[row + i][column] = " ■ ";
-            
             }
         }
         
         for (int i = 1; i <= size; i++) {
             if (column - i >= 0 && displayField[row][column - i].equals(" H ")) {
-                
                 displayField[row][column - i] = " ■ ";
-           
             }
         }
 
         for (int i = 1; i <= size; i++) {
             if (row - i >= 0  && displayField[row - i][column].equals(" H ")) {
-                
                 displayField[row - i][column] = " ■ ";
-          
-                
             }
         }
     }
     
-
+    
     public static void printField(String[][] displayField) {
         System.out.println("    1  2  3  4  5  6  7");
         for (int i = 0; i < 7; i++) {
@@ -237,19 +220,19 @@ public class Main {
         }
         System.out.println("   ---------------------");
     }
-   
-   
+
+
     public static void clearConsole() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
-    
-    
+
+
     public static void displayTopPlayers() {
         System.out.println("Top 10 Players:");
 
         List<Map.Entry<String, Integer>> sortedPlayers = new ArrayList<>(playerScores.entrySet());
-        sortedPlayers.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+        sortedPlayers.sort(Comparator.comparing(Map.Entry::getValue));
 
         int count = 0;
         for (Map.Entry<String, Integer> entry : sortedPlayers) {
